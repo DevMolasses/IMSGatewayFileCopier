@@ -42,6 +42,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="FileCopier.cs" />
+    <Compile Include="FileWatcher.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Directories.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
