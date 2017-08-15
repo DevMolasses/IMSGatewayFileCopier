@@ -41,6 +41,38 @@ namespace IMSGatewayFileCopier
             if (!fileCopied && !fileSkipped) Console.WriteLine(DateTime.Now + " - Unable to Copy " + Path.GetFileName(sourceFile));
         }
 
+        public static void CopyFileToFtp(string sourceFile, string sourceDirectory, string ftpDirectory)
+        {
+            string ftpFile = sourceFile.Replace(sourceDirectory, ftpDirectory);
+            ftpFile = ftpFile.Replace(@"\", "/");
+
+            int tries = 0;
+            int allowedTries = 100;
+            bool fileCopied = false;
+            bool fileSkipped = false;
+            while (tries <= allowedTries)
+            {
+                tries++;
+                try
+                {
+                    if (!Ftp.FtpFileExists(ftpFile))
+                    {
+                        Ftp.FtpFileCopy(sourceFile, ftpFile);
+                        fileCopied = true;
+                        break;
+                    }
+                    else fileSkipped = true;
+                }
+                catch
+                {
+                    Thread.Sleep(500); //Sleep for half a second before trying again
+                }
+            }
+            if (!fileCopied && !fileSkipped) Console.WriteLine(DateTime.Now + " - Unable to Copy " + Path.GetFileName(sourceFile));
+            if (fileCopied) Console.WriteLine(DateTime.Now + " - Copied " + Path.GetFileName(sourceFile));
+            if (fileSkipped) Console.WriteLine(DateTime.Now + " - Skipped " + Path.GetFileName(sourceFile));
+        }
+
         public static void CopyAllFiles(string sourceDirectory, string destinationDirectory)
         {
             string[] sourceFiles = Directory.GetFiles(sourceDirectory);
@@ -49,6 +81,18 @@ namespace IMSGatewayFileCopier
             {
                 string sourceFile = sourceFiles[i];
                 CopyFile(sourceFile, sourceDirectory, destinationDirectory);
+            }
+            Console.WriteLine(DateTime.Now + " - Finished copying {0} files", sourceFiles.Length);
+        }
+
+        public static void CopyAllFilesToFtp(string sourceDirectory, string ftpDirectory)
+        {
+            string[] sourceFiles = Directory.GetFiles(sourceDirectory);
+
+            for (int i = 0; i < sourceFiles.Length; i++)
+            {
+                string sourceFile = sourceFiles[i];
+                CopyFileToFtp(sourceFile, sourceDirectory, ftpDirectory);
             }
             Console.WriteLine(DateTime.Now + " - Finished copying {0} files", sourceFiles.Length);
         }

@@ -12,7 +12,7 @@ namespace IMSGatewayFileCopier
     class Program
     {
         private static Directories dir = new Directories();
-        static FileWatcher fileWatcher = new FileWatcher(dir.sourceDirectory, dir.destinationDirectory);
+        static FileWatcher fileWatcher = new FileWatcher(dir.sourceDirectory, dir.ftpServer);
         FileCopier fileCopier = new FileCopier();
         static bool fileWatcherEnabled = false;
         static bool allFilesCopied = false;
@@ -21,7 +21,7 @@ namespace IMSGatewayFileCopier
         {
             while (true)
             {
-                if (!Directory.Exists(dir.destinationDirectory))
+                if (!Ftp.FtpDirectoryExists(dir.ftpServer))
                 {
                     Console.WriteLine(DateTime.Now + " - Can't find Destination Directory");
                     fileWatcher.DisableWatcher();
@@ -29,7 +29,7 @@ namespace IMSGatewayFileCopier
                     allFilesCopied = false;
                     try
                     {
-                        Directory.CreateDirectory(dir.destinationDirectory);
+                        Ftp.FtpCreateDirectory(dir.ftpServer);
                         Console.WriteLine(DateTime.Now + " - Destination Directory created");
                     }
                     catch (Exception)
@@ -41,7 +41,7 @@ namespace IMSGatewayFileCopier
                 }
                 if(!allFilesCopied)
                 {
-                    ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyAllFiles(dir.sourceDirectory, dir.destinationDirectory));
+                    ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyAllFilesToFtp(dir.sourceDirectory, dir.ftpServer));
                     allFilesCopied = true;
                 }
                 if (!fileWatcherEnabled)
