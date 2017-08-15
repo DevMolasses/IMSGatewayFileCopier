@@ -14,10 +14,6 @@ namespace IMSGatewayFileCopier
 
         public static void CopyFile(string sourceFile, string sourceDirectory, string destinationDirectory)
         {
-            if (!Directory.Exists(destinationDirectory))
-                try { Directory.CreateDirectory(destinationDirectory); }
-                catch { Console.WriteLine("Can't create destination directory"); }
-
             string destinationFile = sourceFile.Replace(sourceDirectory, destinationDirectory);
 
             int tries = 0;
@@ -42,7 +38,7 @@ namespace IMSGatewayFileCopier
                     Thread.Sleep(500); //Sleep for half a second before trying again
                 }
             }
-            if (!fileCopied && !fileSkipped) Console.WriteLine("Unable to Copy " + Path.GetFileName(sourceFile));
+            if (!fileCopied && !fileSkipped) Console.WriteLine(DateTime.Now + " - Unable to Copy " + Path.GetFileName(sourceFile));
         }
 
         public static void CopyAllFiles(string sourceDirectory, string destinationDirectory)
@@ -54,7 +50,7 @@ namespace IMSGatewayFileCopier
                 string sourceFile = sourceFiles[i];
                 CopyFile(sourceFile, sourceDirectory, destinationDirectory);
             }
-            Console.WriteLine("Finished copying all files");
+            Console.WriteLine(DateTime.Now + " - Finished copying {0} files", sourceFiles.Length);
         }
     }
 }

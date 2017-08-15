@@ -12,20 +12,95 @@ namespace IMSGatewayFileCopier
     class Program
     {
         private static Directories dir = new Directories();
+        static FileWatcher fileWatcher = new FileWatcher(dir.sourceDirectory, dir.destinationDirectory);
+        FileCopier fileCopier = new FileCopier();
+        static bool fileWatcherEnabled = false;
+        static bool allFilesCopied = false;
+
         static void Main(string[] args)
         {
-            Console.WriteLine("High Speed File Copier \n\r");
-            ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyAllFiles(dir.sourceDirectory, dir.destinationDirectory));
-            new FileWatcher(dir.sourceDirectory, dir.destinationDirectory);
-            
-            // Hold thread indefinitely. End program with Red X.
             while (true)
             {
-                Thread.Sleep(10000);
+                if (!Directory.Exists(dir.destinationDirectory))
+                {
+                    Console.WriteLine(DateTime.Now + " - Can't find Destination Directory");
+                    fileWatcher.DisableWatcher();
+                    fileWatcherEnabled = false;
+                    allFilesCopied = false;
+                    try
+                    {
+                        Directory.CreateDirectory(dir.destinationDirectory);
+                        Console.WriteLine(DateTime.Now + " - Destination Directory created");
+                    }
+                    catch (Exception)
+                    {
+                        Console.WriteLine(DateTime.Now + " - Destination Directory could not be created");
+                        Thread.Sleep(5000);
+                        continue;
+                    }
+                }
+                if(!allFilesCopied)
+                {
+                    ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyAllFiles(dir.sourceDirectory, dir.destinationDirectory));
+                    allFilesCopied = true;
+                }
+                if (!fileWatcherEnabled)
+                {
+                    fileWatcher.EnableWatcher();
+                    fileWatcherEnabled = true;
+                }
+                Thread.Sleep(100);
             }
+
+            ////Console.WriteLine("High Speed File Copier \n\r");
+            //EstablishConnectionsToDirectories();
+            //ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyAllFiles(dir.sourceDirectory, dir.destinationDirectory));
+            //fileWatcher.EnableWatcher();
+            //new Thread(delegate ()
+            //{
+            //    MaintainConnectionsToDirectories();
+            //}).Start();
+            //// Hold main thread indefinitely. End program with Red X.
+            //while (true)
+            //{
+            //    Thread.Sleep(10000);
+            //}
         }
 
-        //[PermissionSet(SecurityAction.Demand, Name ="FullTrust")]
+        //static void EstablishConnectionsToDirectories()
+        //{
+        //    if(!Directory.Exists(dir.sourceDirectory))
+        //    {
+        //        Console.WriteLine("{0} - {1} can't be found.", DateTime.Now, dir.sourceDirectory);
+        //        Console.WriteLine(DateTime.Now + " - Waiting for Source Directory to be found...");
+        //        while (!Directory.Exists(dir.sourceDirectory)) Thread.Sleep(1000);
+        //    }
+        //    Console.WriteLine("Connected to Source Directory");
+        //    if (!Directory.Exists(dir.destinationDirectory))
+        //    {
+        //        Console.WriteLine("{0} can't be found.", dir.sourceDirectory);
+                
+        //        try
+        //        {
+        //            Console.WriteLine("Trying To creat Destination Directory...");
+        //            Directory.CreateDirectory(dir.destinationDirectory);
+        //        }
+        //        catch
+        //        {
+
+        //            while (!Directory.Exists(dir.destinationDirectory)) Thread.Sleep(1000);
+        //        }
+                
+        //    }
+        //    Console.WriteLine("Connected to Destination Directory");
+        //}
+
+        //private static void MaintainConnectionsToDirectories()
+        //{
+
+        //}
+
+        //[PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
         //public static void Run()
         //{
         //    Directories dir = new Directories();
