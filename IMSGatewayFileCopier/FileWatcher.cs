@@ -22,15 +22,15 @@ namespace IMSGatewayFileCopier
             {
                 fileWatcher.NotifyFilter = NotifyFilters.LastAccess | NotifyFilters.LastWrite |
                     NotifyFilters.FileName | NotifyFilters.DirectoryName;
-                //fileWatcher.Filter = "*.csv";
+                //fileWatcher.Filter = "*.txt";
                 fileWatcher.Created += new FileSystemEventHandler((sender, e) => OnCreated(sender, e, src, dest));
                 fileWatcher.Renamed += new RenamedEventHandler((sender, e) => OnRenamed(sender, e, src, dest));
-                fileWatcher.IncludeSubdirectories = true;
+                fileWatcher.IncludeSubdirectories = false;
                 fileWatcher.Path = src;
             }
             catch (System.Exception e)
             {
-                Console.WriteLine(e);
+                Console.WriteLine(DateTime.Now + " - " + e);
                 throw;
             }
         }
@@ -41,7 +41,7 @@ namespace IMSGatewayFileCopier
         public void EnableWatcher()
         {
             fileWatcher.EnableRaisingEvents = true;
-            //Log.WriteErrorLog("Enabled file watcher");
+            Console.WriteLine(DateTime.Now + " - Enabled file watcher");
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace IMSGatewayFileCopier
         public void DisableWatcher()
         {
             fileWatcher.EnableRaisingEvents = false;
-            //Log.WriteErrorLog("Disabled file watcher");
+            Console.WriteLine(DateTime.Now + " - Disabled file watcher");
         }
 
         /// <summary>
