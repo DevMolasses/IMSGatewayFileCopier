@@ -41,7 +41,8 @@ namespace IMSGatewayFileCopier
                 }
                 if(!allFilesCopied)
                 {
-                    ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyAllFiles(dir.sourceDirectory, dir.destinationDirectory));
+                    //ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyAllFiles(dir.sourceDirectory, dir.destinationDirectory));
+                    ThreadPool.QueueUserWorkItem(_ => FileCompressor.CopyAndCompressAllFiles(dir.sourceDirectory, dir.destinationDirectory));
                     allFilesCopied = true;
                 }
                 if (!fileWatcherEnabled)
