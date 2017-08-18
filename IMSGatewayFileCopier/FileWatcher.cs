@@ -63,7 +63,8 @@ namespace IMSGatewayFileCopier
         private void OnRenamed(object sender, RenamedEventArgs e, string src, string dest)
         {
             Console.WriteLine(DateTime.Now + " - File Renamed");
-            ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyFile(e.FullPath, src, dest, newFile: true));
+            //ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyFile(e.FullPath, src, dest, newFile: true));
+            ThreadPool.QueueUserWorkItem(_ => FileCompressor.CopyAndCompressFile(e.FullPath, src, dest, newFile: true));
         }
 
         /// <summary>
@@ -76,7 +77,8 @@ namespace IMSGatewayFileCopier
         private void OnCreated(object sender, FileSystemEventArgs e, string src, string dest)
         {
             Console.WriteLine(DateTime.Now + " - File Created");
-            ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyFile(e.FullPath, src, dest, newFile: true));
+            //ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyFile(e.FullPath, src, dest, newFile: true));
+            ThreadPool.QueueUserWorkItem(_ => FileCompressor.CopyAndCompressFile(e.FullPath, src, dest, newFile: true));
         }
     }
 }
