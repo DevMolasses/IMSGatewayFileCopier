@@ -39,13 +39,15 @@ namespace IMSGatewayFileCopier
                         continue;
                     }
                 }
-                if(!allFilesCopied)
+                if (!allFilesCopied)
                 {
+                    Console.WriteLine(DateTime.Now + " - Starting to copy all files...");
                     ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyAllFiles(dir.sourceDirectory, dir.destinationDirectory));
                     allFilesCopied = true;
                 }
                 if (!fileWatcherEnabled)
                 {
+                    Console.WriteLine(DateTime.Now + " - Enable FileWatcher...");
                     fileWatcher.EnableWatcher();
                     fileWatcherEnabled = true;
                 }
