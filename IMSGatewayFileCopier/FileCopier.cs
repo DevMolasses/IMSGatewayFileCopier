@@ -37,7 +37,11 @@ namespace IMSGatewayFileCopier
                             fileCopied = true;
                             break;
                         }
-                        else fileSkipped = true;
+                        else
+                        {
+                            fileSkipped = true;
+                            break;
+                        }
                     }
                     else
                     {
@@ -46,8 +50,22 @@ namespace IMSGatewayFileCopier
                         break;
                     }
                 }
-                catch
+                catch (FileNotFoundException e)
                 {
+                    Console.WriteLine(DateTime.Now + " - File has been overwritten...");
+                    Console.WriteLine(e.FileName);
+                    break;
+                }
+                catch (PathTooLongException e)
+                {
+                    Console.WriteLine(DateTime.Now + " - Path too long error...");
+                    Console.WriteLine(e.Data.ToString());
+                    break;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(DateTime.Now + " - Problem copying File");
+                    Console.WriteLine(e.ToString());
                     Thread.Sleep(500); //Sleep for half a second before trying again
                 }
             }
@@ -60,11 +78,12 @@ namespace IMSGatewayFileCopier
         {
             DateTime start = DateTime.Now;
             string[] sourceFiles = Directory.GetFiles(sourceDirectory);
-
+            Array.Sort(sourceFiles, (a, b) => string.Compare(a.Substring(a.LastIndexOf(@"\") + 15), b.Substring(b.LastIndexOf(@"\") + 15)));
             for (int i = 0; i < sourceFiles.Length; i++)
             {
                 string sourceFile = sourceFiles[i];
                 CopyFile(sourceFile, sourceDirectory, destinationDirectory);
+                Thread.Sleep(2);
             }
             DateTime finish = DateTime.Now;
             TimeSpan timeLapsed = finish.Subtract(start);
