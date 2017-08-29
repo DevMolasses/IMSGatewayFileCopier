@@ -13,41 +13,39 @@ namespace IMSGatewayFileCopier
     {
         private static Directories dir = new Directories();
         static FileWatcher fileWatcher = new FileWatcher(dir.sourceDirectory, dir.destinationDirectory);
-        FileCopier fileCopier = new FileCopier();
         static bool fileWatcherEnabled = false;
         static bool allFilesCopied = false;
 
         static void Main(string[] args)
         {
+            Log.NewEntry("BeganIMSFileCopier");
             while (true)
             {
                 if (!Directory.Exists(dir.destinationDirectory))
                 {
-                    Console.WriteLine(DateTime.Now + " - Can't find Destination Directory");
+                    Log.NewEntry("Can't find Destination Directory", dir.destinationDirectory);
                     fileWatcher.DisableWatcher();
                     fileWatcherEnabled = false;
                     allFilesCopied = false;
                     try
                     {
                         Directory.CreateDirectory(dir.destinationDirectory);
-                        Console.WriteLine(DateTime.Now + " - Destination Directory created");
+                        Log.NewEntry("Destination Directory created", dir.destinationDirectory);
                     }
                     catch (Exception)
                     {
-                        Console.WriteLine(DateTime.Now + " - Destination Directory could not be created");
+                        Log.NewEntry("Destination Directory could not be created", dir.destinationDirectory);
                         Thread.Sleep(5000);
                         continue;
                     }
                 }
                 if (!allFilesCopied)
                 {
-                    Console.WriteLine(DateTime.Now + " - Starting to copy all files...");
                     ThreadPool.QueueUserWorkItem(_ => FileCopier.CopyAllFiles(dir.sourceDirectory, dir.destinationDirectory));
                     allFilesCopied = true;
                 }
                 if (!fileWatcherEnabled)
                 {
-                    Console.WriteLine(DateTime.Now + " - Enable FileWatcher...");
                     fileWatcher.EnableWatcher();
                     fileWatcherEnabled = true;
                 }
