@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
+using System.Diagnostics;
 
 namespace IMSGatewayFileCopier
 {
@@ -12,7 +13,7 @@ namespace IMSGatewayFileCopier
     {
         public FileCopier() { }
 
-        public static void CopyFile(string sourceFile, string sourceDirectory, string destinationDirectory, bool newFile = false)
+        public static int CopyFile(string sourceFile, string sourceDirectory, string destinationDirectory, bool newFile = false)
         {
             int tries = 0;
             int allowedTries = 100;
@@ -69,26 +70,58 @@ namespace IMSGatewayFileCopier
                     Thread.Sleep(500); //Sleep for half a second before trying again
                 }
             }
-            if (!fileCopied && !fileSkipped) Console.WriteLine(DateTime.Now + " - Unable to Copy " + Path.GetFileName(sourceFile));
-            if (fileCopied) Console.WriteLine(DateTime.Now + " - Copied " + Path.GetFileName(sourceFile));
-            if (fileSkipped) Console.WriteLine(DateTime.Now + " - Skipped " + Path.GetFileName(sourceFile));
+            if (!fileCopied && !fileSkipped)
+            {
+                Console.WriteLine(DateTime.Now + " - Unable to Copy " + Path.GetFileName(sourceFile));
+                return 0;
+            }
+            if (fileCopied) {
+                Console.WriteLine(DateTime.Now + " - Copied " + Path.GetFileName(sourceFile));
+                return 1;
+            }
+            if (fileSkipped)
+            {
+                Console.WriteLine(DateTime.Now + " - Skipped " + Path.GetFileName(sourceFile));
+                return 2;
+            }
+            return 0;
         }
 
         public static void CopyAllFiles(string sourceDirectory, string destinationDirectory)
         {
             DateTime start = DateTime.Now;
+            long filesCopied = 0, filesSkipped = 0, filesErrored = 0;
             string[] sourceFiles = Directory.GetFiles(sourceDirectory);
+            Log.NewEntry("Starting to copy all files", "Total Files - " + sourceFiles.Length);
             Array.Sort(sourceFiles, (a, b) => string.Compare(a.Substring(a.LastIndexOf(@"\") + 15), b.Substring(b.LastIndexOf(@"\") + 15)));
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
             for (int i = 0; i < sourceFiles.Length; i++)
             {
+                timer.Restart();
                 string sourceFile = sourceFiles[i];
-                CopyFile(sourceFile, sourceDirectory, destinationDirectory);
-                Thread.Sleep(2);
+                int copied = CopyFile(sourceFile, sourceDirectory, destinationDirectory);
+                switch (copied)
+                {
+                    case 0:
+                        filesErrored++;
+                        break;
+                    case 1:
+                        filesCopied++;
+                        break;
+                    case 2:
+                        filesSkipped++;
+                        break;
+                }
+                while (timer.ElapsedMilliseconds < 25) { Thread.Sleep(1); }
             }
             DateTime finish = DateTime.Now;
             TimeSpan timeLapsed = finish.Subtract(start);
-            Console.WriteLine(finish + " - Finished copying {0} files", sourceFiles.Length);
-            Console.WriteLine(finish + " - TimeLapsed: {0}", timeLapsed);
+            Log.NewEntry("Finished copying all files", 
+                         "Files Copied - " + filesCopied, 
+                         "Files Skipped - " + filesSkipped, 
+                         "Files Errored Out - " + filesErrored,
+                         "Time Lapsed - " + timeLapsed);
         }
     }
 }
