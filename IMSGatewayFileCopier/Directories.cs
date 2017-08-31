@@ -8,8 +8,8 @@ namespace IMSGatewayFileCopier
 {
     class Directories
     {
-        private string srcDir = @"D:\Sinet\DAC_TimeSeries";
-        private string destDir = @"E:\RawData";
+        private string srcDir = @"C:\Users\tstewart\Desktop\TestSource";
+        private string destDir = @"C:\Users\tstewart\Desktop\TestDest";
         public string sourceDirectory { get { return srcDir; } set { } }
         public string destinationDirectory { get { return destDir; } set { } }
 

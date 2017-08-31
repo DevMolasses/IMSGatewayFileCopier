@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +15,8 @@ namespace IMSGatewayFileCopier
 
         public static int CopyFile(string sourceFile, string sourceDirectory, string destinationDirectory, bool newFile = false)
         {
+            string destinationFile = sourceFile.Replace(sourceDirectory, destinationDirectory);
+
             int tries = 0;
             int allowedTries = 100;
             bool fileCopied = false;
