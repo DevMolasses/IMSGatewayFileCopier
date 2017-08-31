@@ -41,7 +41,7 @@ namespace IMSGatewayFileCopier
         public void EnableWatcher()
         {
             fileWatcher.EnableRaisingEvents = true;
-            //Log.WriteErrorLog("Enabled file watcher");
+            Log.NewEntry("File watcher enabled");
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace IMSGatewayFileCopier
         public void DisableWatcher()
         {
             fileWatcher.EnableRaisingEvents = false;
-            //Log.WriteErrorLog("Disabled file watcher");
+            Log.NewEntry("File watcher disabled");
         }
 
         /// <summary>
